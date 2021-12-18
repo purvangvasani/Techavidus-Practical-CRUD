@@ -1,0 +1,163 @@
+<!-- <style>
+
+</style> -->
+
+<!-- Toolbar -->
+<div class="toolbar" role="banner">
+  <span>&nbsp; Contact Manager</span>
+</div>
+
+<div class="content" role="main">
+
+  <div class="container">
+    <div>
+      <button data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-success mb-2 mr-2 button-right"> New
+        Product</button>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Product Name</th>
+            <th scope="col" style="width: 400px;">Detail</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col" style="width: 200px;">Total Price</th>
+            <th scope="col">Created date</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="products.length">
+          <tr *ngFor="let prod of products let i = index">
+            <th scope="row">{{i+1}}</th>
+            <td>{{prod.productName}}</td>
+            <td>{{prod.detail}}</td>
+            <td>{{prod.price}}</td>
+            <td>{{prod.quantity}}</td>
+            <td>{{prod.totalPrice}}</td>
+            <td>{{prod.createdAt}}</td>
+            <td>
+              <a data-bs-toggle="modal" data-bs-target="#exampleModal" style="cursor: pointer; color:green"
+                (click)="update(prod._id, i)"><i class="fas fa-edit"></i></a>
+              <a style="cursor: pointer; color:red" (click)="delete(prod._id, i)"> <i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="!products.length">
+          <tr>
+            <td colspan="8" style="text-align: center;">No Data Available!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">{{productId ? 'Update': 'Add'}} Product</h5>
+          <button type="button" class="btn-close" (click)="onClose()" data-bs-dismiss="modal"
+            aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addProductForm" [formGroup]="addProductForm" autocomplete="off">
+            <div class="row">
+              <div class="form-group">
+                <label for="file">File</label>
+                <input formControlName="file" id="file" type="file" class="form-control"
+                  (change)="onFileChange($event)">
+                <!-- <div *ngIf="f.file.touched && f.file.invalid" class="alert alert-danger">
+                  <div *ngIf="f.file.errors.required">File is required.</div>
+                </div> -->
+              </div>
+
+              <img [src]="imageSrc" *ngIf="imageSrc" style="height: 30px; width:50px">
+            </div>
+            <div class="row">
+              <label for="productName" class="label control-label col-sm-4 col-form-label">Product Name*</label>
+              <div class="col-sm-8">
+                <input type="input" class="form-control" id="productName" name="text" formControlName="productName"
+                  autocomplete="off" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <label class="label control-label col-sm-4 col-form-label"></label>
+              <div class="col-sm-8"
+                *ngIf="addProductForm.controls['productName'].hasError('required') && addProductForm.controls['productName'].touched">
+                <span style="color:red">Product Name is required</span>
+              </div>
+            </div>
+            <div class="row">
+              <label for="detail" class="label control-label col-sm-4 col-form-label">Detail*</label>
+              <div class="col-sm-8">
+                <input type="input" class="form-control" id="detail" name="text" formControlName="detail"
+                  autocomplete="off" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <label class="label control-label col-sm-4 col-form-label"></label>
+              <div class="col-sm-8"
+                *ngIf="addProductForm.controls['detail'].hasError('required') && addProductForm.controls['detail'].touched">
+                <span style="color:red">Detail is required</span>
+              </div>
+            </div>
+            <div class="row">
+              <label for="price" class="label control-label col-sm-4 col-form-label">Price*</label>
+              <div class="col-sm-8">
+                <input type="input" class="form-control" id="price" name="text" formControlName="price"
+                  autocomplete="off" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <label class="label control-label col-sm-4 col-form-label"></label>
+              <div class="col-sm-8"
+                *ngIf="addProductForm.controls['price'].hasError('required') && addProductForm.controls['price'].touched">
+                <span style="color:red">Price is required</span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <label class="label control-label col-sm-4 col-form-label"></label>
+              <div class="col-sm-8"
+                *ngIf="addProductForm.value.price && addProductForm.controls['price'].hasError('number')">
+                <span style="color:red">Price should be in digits</span>
+              </div>
+            </div>
+            <div class="row">
+              <label for="quantity" class="label control-label col-sm-4 col-form-label">Quantity*</label>
+              <div class="col-sm-8">
+                <input type="number" min="0" class="form-control" (change)="onChangeEvent($event)" id="quantity"
+                  name="text" formControlName="quantity" autocomplete="off" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <label class="label control-label col-sm-4 col-form-label"></label>
+              <div class="col-sm-8"
+                *ngIf="addProductForm.controls['quantity'].hasError('required') && addProductForm.controls['quantity'].touched">
+                <span style="color:red">Quantity is required</span>
+              </div>
+            </div>
+            <div class="row">
+              <label for="totalPrice" class="label control-label col-sm-4 col-form-label">Total Price*</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="totalPrice" name="text" disabled value="{{totalPrice}}"
+                  autocomplete="off" />
+              </div>
+            </div>
+          </form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onClose()" data-bs-dismiss="modal">Cancel</button>
+            <div *ngIf="productId">
+              <button type="submit" data-bs-dismiss="modal" (click)="onUpdate()" class="btn btn-primary">Update</button>
+            </div>
+            <div *ngIf="!productId">
+              <button type="submit" data-bs-dismiss="modal" (click)="addProduct()" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
